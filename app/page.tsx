@@ -325,20 +325,6 @@ export default function Home() {
 
               <Download className="w-5 h-5 z-10" />
               <span className="z-10">
-              </div>
-            </section>
-          </main>
-
-          {/* Developer Footer */}
-          <footer className="mt-12 text-center text-gray-500 text-sm pb-8">
-            <p>
-              Developed by{' '}
-              <a
-                href="https://www.linkedin.com/in/dr-shahid-islam/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 transition-colors"
-              >
                 Dr. Shahid Islam
               </a>
             </p>
