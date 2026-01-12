@@ -324,88 +324,104 @@ export default function Home() {
               )}
 
               <Download className="w-5 h-5 z-10" />
-              <span className="z-10">
-                Dr. Shahid Islam
-              </a>
-            </p>
-          </footer>
+              {isRendering ? `Rendering ${renderProgress}%...` : 'Render Video'}
+            </span>
+          </button>
+        </div>
+      </section>
+    </main>
 
-          {/* Settings Modal */}
-          {
-            isSettingsOpen && (
-              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
-                <div className="glass-panel p-8 w-full max-w-md space-y-6 relative">
-                  <h2 className="text-2xl font-bold">Project Settings</h2>
+      {/* Developer Footer */ }
+  <footer className="mt-12 text-center text-gray-500 text-sm pb-8">
+    <p>
+      Developed by{' '}
+      <a
+        href="https://www.linkedin.com/in/dr-shahid-islam/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-purple-400 hover:text-purple-300 transition-colors"
+      >
+        Dr. Shahid Islam
+      </a>
+    </p>
+  </footer>
 
-                  {/* Aspect Ratio */}
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-400">Aspect Ratio</label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <button
-                        onClick={() => setAspectRatio('9:16')}
-                        className={`p-3 rounded-lg border ${aspectRatio === '9:16' ? 'bg-purple-600 border-purple-500' : 'border-white/10 hover:bg-white/5'}`}
-                      >
-                        Mobile (9:16)
-                      </button>
-                      <button
-                        onClick={() => setAspectRatio('16:9')}
-                        className={`p-3 rounded-lg border ${aspectRatio === '16:9' ? 'bg-purple-600 border-purple-500' : 'border-white/10 hover:bg-white/5'}`}
-                      >
-                        Cinema (16:9)
-                      </button>
-                    </div>
-                  </div>
+  {/* Settings Modal */ }
+  {
+    isSettingsOpen && (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="glass-panel p-8 w-full max-w-md space-y-6 relative">
+          <h2 className="text-2xl font-bold">Project Settings</h2>
 
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-400">Theme (Auto-detected from Script)</label>
-                    <select
-                      value={selectedTheme}
-                      onChange={(e) => setSelectedTheme(e.target.value as any)}
-                      className="w-full bg-black/50 border border-white/10 rounded-lg p-3 outline-none focus:border-purple-500"
-                    >
-                      <option value="default">Default / Mixed</option>
-                      <option value="horror">Horror (Slow Fades)</option>
-                      <option value="exciting">Action (Fast Cuts)</option>
-                      <option value="happy">Happy (Bright)</option>
-                    </select>
-                  </div>
+          {/* Aspect Ratio */}
+          <div className="space-y-2">
+            <label className="text-sm text-gray-400">Aspect Ratio</label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => setAspectRatio('9:16')}
+                className={`p-3 rounded-lg border ${aspectRatio === '9:16' ? 'bg-purple-600 border-purple-500' : 'border-white/10 hover:bg-white/5'}`}
+              >
+                Mobile (9:16)
+              </button>
+              <button
+                onClick={() => setAspectRatio('16:9')}
+                className={`p-3 rounded-lg border ${aspectRatio === '16:9' ? 'bg-purple-600 border-purple-500' : 'border-white/10 hover:bg-white/5'}`}
+              >
+                Cinema (16:9)
+              </button>
+            </div>
+          </div>
 
-                  {/* Voice Selector */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Narrator Voice</label>
-                    <select
-                      value={selectedVoice}
-                      onChange={(e) => setSelectedVoice(e.target.value)}
-                      className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 mb-2"
-                    >
-                      {VOICES.map(v => (
-                        <option key={v.id} value={v.id} className="bg-gray-900">
-                          {v.name}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={handleGenerateVO}
-                      disabled={loading}
-                      className="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Wand2 size={16} />
-                      Generate / Update Voice
-                    </button>
-                  </div>
+          <div className="space-y-2">
+            <label className="text-sm text-gray-400">Theme (Auto-detected from Script)</label>
+            <select
+              value={selectedTheme}
+              onChange={(e) => setSelectedTheme(e.target.value as any)}
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 outline-none focus:border-purple-500"
+            >
+              <option value="default">Default / Mixed</option>
+              <option value="horror">Horror (Slow Fades)</option>
+              <option value="exciting">Action (Fast Cuts)</option>
+              <option value="happy">Happy (Bright)</option>
+            </select>
+          </div>
 
-                  <div className="pt-4 flex justify-end gap-4">
-                    <button
-                      onClick={() => setIsSettingsOpen(false)}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      Done
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          }
+          {/* Voice Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Narrator Voice</label>
+            <select
+              value={selectedVoice}
+              onChange={(e) => setSelectedVoice(e.target.value)}
+              className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 mb-2"
+            >
+              {VOICES.map(v => (
+                <option key={v.id} value={v.id} className="bg-gray-900">
+                  {v.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleGenerateVO}
+              disabled={loading}
+              className="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            >
+              <Wand2 size={16} />
+              Generate / Update Voice
+            </button>
+          </div>
+
+          <div className="pt-4 flex justify-end gap-4">
+            <button
+              onClick={() => setIsSettingsOpen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
         </div >
         );
 }
