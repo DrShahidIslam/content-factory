@@ -1,0 +1,150 @@
+[2026-01-11T07:54:47.865Z] TTS EXEC ERROR:
+CMD: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+STDERR: At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+ERROR: Command failed: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+[2026-01-11T07:54:47.868Z] MAIN ERROR: Command failed: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+Stack: Error: Command failed: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+    at __node_internal_genericNodeError (node:internal/errors:866:15)
+    at ChildProcess.exithandler (node:child_process:422:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1105:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5)
+    at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+[2026-01-11T07:54:50.837Z] TTS EXEC ERROR:
+CMD: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+STDERR: At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+ERROR: Command failed: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+[2026-01-11T07:54:50.842Z] MAIN ERROR: Command failed: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+Stack: Error: Command failed: powershell -Command ";        Add-Type -AssemblyName System.Speech;;        $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer;;        $synth.SetOutputToWaveFile('G:\Iskills\Youtube\New folder\voiceover_generated.wav');;        $synth.Speak('Something grabbed my ankle the moment my foot touched the floor.  I froze.  It tightened.  Slowly.  I tried to pull away.  It pulled back.  Stronger.  I didn’t look down.  I didn’t scream.  Because whatever was holding me was breathing…  and it was already under my bed.');;        $synth.Dispose();;        "
+At line:1 char:392
++ ... .  I tried to pull away.  It pulled back.  Stronger.  I didn't look d ...
++                                                                  ~
+Missing ')' in method call.
+At line:1 char:392
++ ...   I tried to pull away.  It pulled back.  Stronger.  I didn't look do ...
++                                                                 ~
+Unexpected token 't' in expression or statement.
+At line:1 char:505
++ ... holding me was breathing.  and it was already under my bed.');;       ...
++                                                                 ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInMethodCall
+ 
+
+    at __node_internal_genericNodeError (node:internal/errors:866:15)
+    at ChildProcess.exithandler (node:child_process:422:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1105:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5)
+    at Process.callbackTrampoline (node:internal/async_hooks:130:17)

@@ -6,16 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "video": "remotion studio remotion/index.ts",
+    "build:video": "remotion render remotion/index.ts"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.404",
+    "@remotion/media-utils": "^4.0.404",
+    "@remotion/player": "^4.0.404",
+    "@remotion/shapes": "^4.0.404",
+    "@remotion/transitions": "^4.0.404",
+    "edge-tts-client": "^1.0.2",
+    "edge-tts-universal": "^1.3.3",
+    "lucide-react": "^0.562.0",
     "next": "16.1.1",
+    "node-edge-tts": "^1.2.8",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "remotion": "^4.0.404",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.28",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
