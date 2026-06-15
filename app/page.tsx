@@ -21,6 +21,13 @@ export default function Home() {
     setProject({ ...project, assets: newAssets });
   };
 
+  const updateAssetSpeedRamp = (index: number, speedRamp: 'none' | 'impact-slow' | 'slow-fast' | 'fast-slow') => {
+    if (!project) return;
+    const newAssets = [...project.assets];
+    newAssets[index] = { ...newAssets[index], speedRamp };
+    setProject({ ...project, assets: newAssets });
+  };
+
   const updateScript = (text: string) => {
     if (!project) return;
     setProject({ ...project, scriptContent: text });
@@ -274,6 +281,22 @@ export default function Home() {
                     onChange={(e) => updateAssetOverlay(i, e.target.value)}
                     className="bg-black/50 border border-white/10 rounded-md px-3 py-1.5 text-sm outline-none focus:border-purple-500 w-full mt-1 text-gray-200"
                   />
+                  {/* Speed Ramping Selection */}
+                  {asset.type === 'video' && (
+                    <div className="mt-2 flex items-center justify-between gap-2 bg-black/30 p-2 rounded-md border border-white/5">
+                      <span className="text-xs text-gray-400 font-medium font-sans">Speed Effect:</span>
+                      <select
+                        value={asset.speedRamp || 'none'}
+                        onChange={(e) => updateAssetSpeedRamp(i, e.target.value as any)}
+                        className="bg-black/60 border border-white/10 rounded px-2 py-1 text-xs outline-none focus:border-purple-500 text-gray-200 cursor-pointer"
+                      >
+                        <option value="none">Normal (1.0x)</option>
+                        <option value="impact-slow">Impact (Fast ➜ Slow-Mo ➜ Normal)</option>
+                        <option value="slow-fast">Build-up (Slow-Mo ➜ Fast-Motion)</option>
+                        <option value="fast-slow">Tension (Fast-Motion ➜ Slow-Mo)</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
               )) : (
                 <div className="text-center text-gray-500 py-10">Loading assets...</div>

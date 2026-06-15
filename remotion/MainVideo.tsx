@@ -1,5 +1,5 @@
 import React from 'react';
-import { useVideoConfig, useCurrentFrame, Audio, Img, Video } from 'remotion';
+import { useVideoConfig, useCurrentFrame, Audio, Img, Video, interpolate, AbsoluteFill, Sequence } from 'remotion';
 import { ProjectData } from './types';
 import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { fade } from '@remotion/transitions/fade';
@@ -10,6 +10,149 @@ import { applyHybridPacing } from './lib/pacing-engine';
 import { Captions } from './Captions';
 import { ColorGrade } from './Visuals/ColorGrade';
 import { SportsOverlay } from './Visuals/SportsOverlay';
+
+// SpeedRampedVideo split segments player for time remapping
+const SpeedRampedVideo: React.FC<{
+    src: string;
+    speedRamp: 'none' | 'impact-slow' | 'slow-fast' | 'fast-slow';
+    durationInFrames: number;
+    fps: number;
+}> = ({ src, speedRamp, durationInFrames, fps }) => {
+    const totalDurationSec = durationInFrames / fps;
+
+    if (!speedRamp || speedRamp === 'none') {
+        return (
+            <Video
+                src={src}
+                muted={true}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+        );
+    }
+
+    let parts: {
+        compStartPct: number;
+        compEndPct: number;
+        videoStartPct: number;
+        videoEndPct: number;
+    }[] = [];
+
+    if (speedRamp === 'impact-slow') {
+        parts = [
+            { compStartPct: 0, compEndPct: 0.3, videoStartPct: 0, videoEndPct: 0.45 },
+            { compStartPct: 0.3, compEndPct: 0.7, videoStartPct: 0.45, videoEndPct: 0.55 },
+            { compStartPct: 0.7, compEndPct: 1.0, videoStartPct: 0.55, videoEndPct: 1.0 }
+        ];
+    } else if (speedRamp === 'slow-fast') {
+        parts = [
+            { compStartPct: 0, compEndPct: 0.5, videoStartPct: 0, videoEndPct: 0.2 },
+            { compStartPct: 0.5, compEndPct: 1.0, videoStartPct: 0.2, videoEndPct: 1.0 }
+        ];
+    } else if (speedRamp === 'fast-slow') {
+        parts = [
+            { compStartPct: 0, compEndPct: 0.5, videoStartPct: 0, videoEndPct: 0.8 },
+            { compStartPct: 0.5, compEndPct: 1.0, videoStartPct: 0.8, videoEndPct: 1.0 }
+        ];
+    }
+
+    return (
+        <AbsoluteFill>
+            {parts.map((part, i) => {
+                const startFrame = Math.round(part.compStartPct * durationInFrames);
+                const endFrame = Math.round(part.compEndPct * durationInFrames);
+                const partDurationFrames = endFrame - startFrame;
+
+                if (partDurationFrames <= 0) return null;
+
+                const startSec = part.videoStartPct * totalDurationSec;
+                const endSec = part.videoEndPct * totalDurationSec;
+                const playDuration = endSec - startSec;
+
+                const compDurationSec = partDurationFrames / fps;
+                const playbackRate = playDuration / compDurationSec;
+                const safePlaybackRate = Math.min(16, Math.max(0.1, playbackRate));
+
+                const videoStartFrame = Math.round(startSec * fps);
+                const videoEndFrame = Math.round(endSec * fps);
+
+                return (
+                    <Sequence
+                        key={i}
+                        from={startFrame}
+                        durationInFrames={partDurationFrames}
+                        layout="absolute-fill"
+                    >
+                        <Video
+                            src={src}
+                            startFrom={videoStartFrame}
+                            endAt={videoEndFrame}
+                            playbackRate={safePlaybackRate}
+                            muted={true}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                            }}
+                        />
+                    </Sequence>
+                );
+            })}
+        </AbsoluteFill>
+    );
+};
+
+// SequenceContent wrapper for Ken Burns & Camera Shake effects
+const SequenceContent: React.FC<{
+    asset: any;
+    activeTheme: string;
+    durationInFrames: number;
+    fps: number;
+}> = ({ asset, activeTheme, durationInFrames, fps }) => {
+    const frame = useCurrentFrame();
+
+    // 1. Ken Burns Zoom-in Animation
+    const scale = interpolate(
+        frame,
+        [0, durationInFrames],
+        [1.04, 1.14],
+        { extrapolateRight: 'clamp' }
+    );
+
+    // 2. Camera Shake on cut impact (first 12 frames of sports clips)
+    let translateX = 0;
+    let translateY = 0;
+    if ((activeTheme === 'sports' || activeTheme === 'exciting') && frame < 12) {
+        const shakeIntensity = interpolate(frame, [0, 12], [5, 0], { extrapolateRight: 'clamp' });
+        translateX = Math.sin(frame * 2.2) * shakeIntensity;
+        translateY = Math.cos(frame * 2.2) * shakeIntensity;
+    }
+
+    return (
+        <div style={{
+            width: '100%',
+            height: '100%',
+            transform: `scale(${scale}) translate(${translateX}px, ${translateY}px)`,
+        }}>
+            {asset.type === 'image' ? (
+                <Img
+                    src={asset.path}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                    }}
+                />
+            ) : asset.type === 'video' ? (
+                <SpeedRampedVideo
+                    src={asset.path}
+                    speedRamp={asset.speedRamp}
+                    durationInFrames={durationInFrames}
+                    fps={fps}
+                />
+            ) : null}
+        </div>
+    );
+};
 
 // Random Transition Picker (Themed)
 const getThemedTransition = (index: number, theme: 'horror' | 'exciting' | 'happy' | 'sports' | 'default'): any => {
@@ -64,6 +207,22 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
         return 'Cinematic Whoosh.mp3';
     }
 
+    // Apply color grade filter preset directly to video container
+    const getVideoFilter = () => {
+        switch (activeTheme) {
+            case 'sports':
+                return 'contrast(1.18) saturate(1.4) brightness(1.05)'; // Bold vibrant stadium look
+            case 'horror':
+                return 'contrast(1.25) saturate(0.35) brightness(0.85) hue-rotate(15deg)'; // Creepy desaturated cold look
+            case 'exciting':
+                return 'contrast(1.2) saturate(1.3) brightness(1.02)'; // Energetic high action look
+            case 'happy':
+                return 'contrast(1.05) saturate(1.2) brightness(1.05) sepia(0.05)'; // Warm cozy look
+            default:
+                return 'contrast(1.05) saturate(1.1)'; // Gentle standard boost
+        }
+    };
+
     // "Alive" Pulse Animation (Simulated Beat)
     const frame = useCurrentFrame();
 
@@ -72,7 +231,9 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
     const beat = Math.sin(frame / 10) * 0.005 + 1.005; // Very subtle breath
 
     return (
-        <div style={{ flex: 1, backgroundColor: 'black', transform: `scale(${beat})` }}>
+        <div style={{ flex: 1, backgroundColor: 'black', transform: `scale(${beat})`, position: 'relative' }}>
+
+
             {/* Background Music */}
             {audioTrack && (
                 <Audio
@@ -89,54 +250,49 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
                 />
             )}
 
+            {/* Continuous Stadium Crowd Noise for Sports Theme */}
+            {activeTheme === 'sports' && assets.length > 0 && (
+                <Audio
+                    src="http://localhost:3000/api/serve/sfx/Stadium%20Cheer.mp3"
+                    volume={0.25}
+                />
+            )}
+
             {/* Visual Timeline with Transitions */}
-            <TransitionSeries>
-                {assets.map((asset, index) => {
-                    const durationInSeconds = asset.durationInSeconds || defaultImageDuration;
-                    const durationInFrames = Math.round(durationInSeconds * fps);
+            <div style={{ width: '100%', height: '100%', filter: getVideoFilter() }}>
+                <TransitionSeries>
+                    {assets.map((asset, index) => {
+                        const durationInSeconds = asset.durationInSeconds || defaultImageDuration;
+                        const durationInFrames = Math.round(durationInSeconds * fps);
 
-                    return (
-                        <React.Fragment key={index}>
-                            <TransitionSeries.Sequence durationInFrames={durationInFrames}>
-                                {asset.type === 'image' ? (
-                                    <Img
-                                        src={asset.path}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
+                        return (
+                            <React.Fragment key={index}>
+                                <TransitionSeries.Sequence durationInFrames={durationInFrames}>
+                                    <SequenceContent
+                                        asset={asset}
+                                        activeTheme={activeTheme}
+                                        durationInFrames={durationInFrames}
+                                        fps={fps}
                                     />
-                                ) : asset.type === 'video' ? (
-                                    <Video
-                                        src={asset.path}
-                                        playbackRate={asset.playbackRate || 1} // Apply Time Remapping
-                                        muted={true} // Ensure background video audio doesn't clash with VO
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover' // This ensures 16:9 fills 9:16 perfectly
-                                        }}
-                                    />
-                                ) : null}
 
-                                {/* Custom Text Overlay for this clip */}
-                                {asset.overlayText && (
-                                    <SportsOverlay text={asset.overlayText} styleType={activeTheme === 'sports' ? 'gold' : 'impact'} />
+                                    {/* Custom Text Overlay for this clip */}
+                                    {asset.overlayText && (
+                                        <SportsOverlay text={asset.overlayText} styleType={activeTheme === 'sports' ? 'gold' : 'impact'} />
+                                    )}
+                                </TransitionSeries.Sequence>
+
+                                {/* Auto-Transition between clips (except last one) */}
+                                {index < assets.length - 1 && (
+                                    <TransitionSeries.Transition
+                                        presentation={getThemedTransition(index, activeTheme as any)}
+                                        timing={linearTiming({ durationInFrames: TRANSITION_DURATION })}
+                                    />
                                 )}
-                            </TransitionSeries.Sequence>
-
-                            {/* Auto-Transition between clips (except last one) */}
-                            {index < assets.length - 1 && (
-                                <TransitionSeries.Transition
-                                    presentation={getThemedTransition(index, activeTheme as any)}
-                                    timing={linearTiming({ durationInFrames: TRANSITION_DURATION })}
-                                />
-                            )}
-                        </React.Fragment>
-                    );
-                })}
-            </TransitionSeries>
+                            </React.Fragment>
+                        );
+                    })}
+                </TransitionSeries>
+            </div>
 
             {/* Auto-SFX Layer */}
             {assets.map((asset, index) => {
@@ -193,7 +349,7 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
             )}
 
             {/* Visual Polish */}
-            <ColorGrade />
+            <ColorGrade theme={activeTheme} />
         </div>
     );
 };

@@ -7,6 +7,7 @@ export const AssetSchema = z.object({
     durationInSeconds: z.number().optional(), // For videos/audio
     playbackRate: z.number().optional(), // New: For Time Remapping
     overlayText: z.string().optional(), // Custom text overlay for this specific clip
+    speedRamp: z.enum(['none', 'impact-slow', 'slow-fast', 'fast-slow']).optional(), // Time Ramping
 });
 
 export interface SFXCue {
