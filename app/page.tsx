@@ -37,6 +37,7 @@ export default function Home() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<'9:16' | '16:9'>('9:16');
   const [selectedTheme, setSelectedTheme] = useState<'default' | 'horror' | 'exciting' | 'happy' | 'sports'>('sports');
+  const [selectedFilter, setSelectedFilter] = useState<'none' | 'vibrant-sports' | 'warm-gold' | 'cold-cinematic' | 'vintage-sepia' | 'noir' | 'neon-cyber'>('none');
   const [selectedVoice, setSelectedVoice] = useState('en-US-ChristopherNeural');
 
   const VOICES = [
@@ -77,6 +78,9 @@ export default function Home() {
       // Sync local state if first load
       if (selectedTheme === 'default' && data.theme) {
         setSelectedTheme(data.theme);
+      }
+      if (selectedFilter === 'none' && data.colorFilter) {
+        setSelectedFilter(data.colorFilter as any);
       }
       setProject(data);
 
@@ -151,6 +155,7 @@ export default function Home() {
         body: JSON.stringify({
           projectId, // This is now the value from input (can be path or ID)
           theme: selectedTheme,
+          colorFilter: selectedFilter,
           aspectRatio
         })
       });
@@ -340,7 +345,8 @@ export default function Home() {
                   inputProps={{
                     projectData: {
                       ...project,
-                      theme: selectedTheme // Pass Theme Override
+                      theme: selectedTheme, // Pass Theme Override
+                      colorFilter: selectedFilter // Pass Color Filter Override
                     }
                   }}
                   durationInFrames={durationInFrames}
@@ -451,6 +457,24 @@ export default function Home() {
               <option value="horror">Horror (Slow Fades)</option>
               <option value="exciting">Action (Fast Cuts)</option>
               <option value="happy">Happy (Bright)</option>
+            </select>
+          </div>
+
+          {/* Color Grading Filter Dropdown */}
+          <div className="space-y-2">
+            <label className="text-sm text-gray-400">Color Grading Filter Preset</label>
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value as any)}
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 outline-none focus:border-purple-500 text-white"
+            >
+              <option value="none">Normal / Raw Footage</option>
+              <option value="vibrant-sports">Vibrant Sports (High Contrast & Saturation)</option>
+              <option value="warm-gold">Warm Golden Hour (Amber Broadcast Glow)</option>
+              <option value="cold-cinematic">Cold Cinematic (Slate Blue / Cyan Tint)</option>
+              <option value="vintage-sepia">Vintage Retro (Nostalgic Brown Tint)</option>
+              <option value="noir">Classic Film Noir (Moody Black & White)</option>
+              <option value="neon-cyber">Neon Cyberpunk (Magenta & Violet Pop)</option>
             </select>
           </div>
 

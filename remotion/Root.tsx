@@ -19,7 +19,8 @@ export const RemotionRoot: React.FC = () => {
                         assets: [],
                         fps: 30,
                         defaultImageDuration: 3,
-                        theme: 'sports'
+                        theme: 'sports',
+                        colorFilter: 'none'
                     }
                 }}
                 calculateMetadata={async ({ props }) => {
@@ -36,6 +37,9 @@ export const RemotionRoot: React.FC = () => {
                     // Apply Metadata overrides (CLI props)
                     if (props.projectData?.theme) {
                         data.theme = props.projectData.theme;
+                    }
+                    if (props.projectData?.colorFilter) {
+                        data.colorFilter = props.projectData.colorFilter;
                     }
 
                     // Calculate total duration
@@ -74,7 +78,8 @@ export const RemotionRoot: React.FC = () => {
                         assets: [],
                         fps: 30,
                         defaultImageDuration: 3,
-                        theme: 'sports'
+                        theme: 'sports',
+                        colorFilter: 'none'
                     }
                 }}
                 calculateMetadata={async ({ props }) => {
@@ -87,6 +92,9 @@ export const RemotionRoot: React.FC = () => {
 
                     if (props.projectData?.theme) {
                         data.theme = props.projectData.theme;
+                    }
+                    if (props.projectData?.colorFilter) {
+                        data.colorFilter = props.projectData.colorFilter;
                     }
 
                     let totalDuration = 0;

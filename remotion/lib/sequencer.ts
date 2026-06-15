@@ -40,6 +40,7 @@ export const prepareProjectData = (id: string, assets: Asset[]): ProjectData => 
         audioTrack: music?.path,
         defaultImageDuration: 3,
         fps: 30,
-        theme: 'default'
+        theme: 'default',
+        colorFilter: 'none'
     };
 };

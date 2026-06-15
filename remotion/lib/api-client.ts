@@ -190,6 +190,7 @@ export const fetchProjectData = async (projectId: string): Promise<ProjectData> 
             id: projectId,
             assets: [],
             theme: 'default',
+            colorFilter: 'none',
             fps: 30,
             defaultImageDuration: 3
         };

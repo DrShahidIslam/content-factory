@@ -39,6 +39,7 @@ export const ProjectSchema = z.object({
     voiceoverTrack: z.string().optional(),
     voiceoverPlaybackRate: z.number().optional(), // New: Elastic Audio
     theme: z.enum(['horror', 'exciting', 'happy', 'sports', 'default']).default('default'),
+    colorFilter: z.enum(['none', 'vibrant-sports', 'warm-gold', 'cold-cinematic', 'vintage-sepia', 'noir', 'neon-cyber']).default('none'),
     sfxCues: z.array(z.custom<SFXCue>()).optional(),
     fps: z.number().default(30),
     durationInSeconds: z.number().optional(), // Master duration

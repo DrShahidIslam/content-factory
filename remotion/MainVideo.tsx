@@ -195,6 +195,7 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
 
     const { assets, audioTrack, voiceoverTrack, defaultImageDuration, fps } = pacedData;
     const activeTheme = projectData.theme || 'default'; // Current UI theme
+    const activeFilter = projectData.colorFilter || 'none'; // Current Color Grading Filter
 
     // Themed Duration
     const TRANSITION_DURATION = activeTheme === 'horror' ? 30 : (activeTheme === 'sports' ? 5 : 10);
@@ -209,17 +210,21 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
 
     // Apply color grade filter preset directly to video container
     const getVideoFilter = () => {
-        switch (activeTheme) {
-            case 'sports':
+        switch (activeFilter) {
+            case 'vibrant-sports':
                 return 'contrast(1.18) saturate(1.4) brightness(1.05)'; // Bold vibrant stadium look
-            case 'horror':
-                return 'contrast(1.25) saturate(0.35) brightness(0.85) hue-rotate(15deg)'; // Creepy desaturated cold look
-            case 'exciting':
-                return 'contrast(1.2) saturate(1.3) brightness(1.02)'; // Energetic high action look
-            case 'happy':
-                return 'contrast(1.05) saturate(1.2) brightness(1.05) sepia(0.05)'; // Warm cozy look
+            case 'warm-gold':
+                return 'contrast(1.1) saturate(1.2) brightness(1.05) sepia(0.08)'; // Warm sunset glow
+            case 'cold-cinematic':
+                return 'contrast(1.2) saturate(0.75) brightness(0.95) hue-rotate(5deg)'; // Cold creepy blue-cyan tone
+            case 'vintage-sepia':
+                return 'contrast(0.95) saturate(0.8) sepia(0.35) brightness(1.02)'; // Nostalgic retro sepia
+            case 'noir':
+                return 'contrast(1.3) grayscale(1.0) brightness(0.95)'; // Moody Black & White
+            case 'neon-cyber':
+                return 'contrast(1.25) saturate(1.5) hue-rotate(-20deg)'; // Cyberpunk neon pop
             default:
-                return 'contrast(1.05) saturate(1.1)'; // Gentle standard boost
+                return 'none';
         }
     };
 
@@ -349,7 +354,7 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
             )}
 
             {/* Visual Polish */}
-            <ColorGrade theme={activeTheme} />
+            <ColorGrade colorFilter={activeFilter} />
         </div>
     );
 };

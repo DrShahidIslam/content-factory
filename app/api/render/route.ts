@@ -11,7 +11,7 @@ const RENDER_STATUS_FILE = path.join(process.cwd(), 'render_status.json');
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { projectId, theme, aspectRatio } = body;
+        const { projectId, theme, colorFilter, aspectRatio } = body;
 
         if (!projectId) {
             return NextResponse.json({ error: 'Missing projectId' }, { status: 400 });
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
             projectData: {
                 id: projectId,
                 theme: theme,
+                colorFilter: colorFilter || 'none',
                 assets: absoluteAssets, // Injecting assets directly!
                 fps: 30,
                 defaultImageDuration: 3
