@@ -41,18 +41,37 @@ export async function GET(
             const chunksize = (end - start) + 1;
             const file = fs.createReadStream(videoPath, { start, end });
 
-            // Node.js ReadStream is not directly compatible with Web ReadableStream, 
-            // but Next.js/Response handles standard streams or we can convert.
-            // NextJS App Router Response handles node streams fine usually if passed as BodyInit?
-            // Actually strictly speaking, NextResponse body expects ReadableStream (Web), not ReadStream (Node).
-            // But we can use `new Response(stream)` in Node env usually.
-            // To be safe and typed, we use Iterator.
-
             const stream = new ReadableStream({
                 start(controller) {
-                    file.on('data', (chunk) => controller.enqueue(chunk));
-                    file.on('end', () => controller.close());
-                    file.on('error', (err) => controller.error(err));
+                    let active = true;
+                    file.on('data', (chunk) => {
+                        if (active) {
+                            try {
+                                controller.enqueue(chunk);
+                            } catch (e) {
+                                active = false;
+                            }
+                        }
+                    });
+                    file.on('end', () => {
+                        if (active) {
+                            try {
+                                controller.close();
+                            } catch (e) {}
+                            active = false;
+                        }
+                    });
+                    file.on('error', (err) => {
+                        if (active) {
+                            try {
+                                controller.error(err);
+                            } catch (e) {}
+                            active = false;
+                        }
+                    });
+                },
+                cancel() {
+                    file.destroy();
                 }
             });
 
@@ -72,9 +91,35 @@ export async function GET(
             const file = fs.createReadStream(videoPath);
             const stream = new ReadableStream({
                 start(controller) {
-                    file.on('data', (chunk) => controller.enqueue(chunk));
-                    file.on('end', () => controller.close());
-                    file.on('error', (err) => controller.error(err));
+                    let active = true;
+                    file.on('data', (chunk) => {
+                        if (active) {
+                            try {
+                                controller.enqueue(chunk);
+                            } catch (e) {
+                                active = false;
+                            }
+                        }
+                    });
+                    file.on('end', () => {
+                        if (active) {
+                            try {
+                                controller.close();
+                            } catch (e) {}
+                            active = false;
+                        }
+                    });
+                    file.on('error', (err) => {
+                        if (active) {
+                            try {
+                                controller.error(err);
+                            } catch (e) {}
+                            active = false;
+                        }
+                    });
+                },
+                cancel() {
+                    file.destroy();
                 }
             });
 
