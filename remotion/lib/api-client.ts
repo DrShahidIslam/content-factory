@@ -126,35 +126,7 @@ export const fetchProjectData = async (projectId: string): Promise<ProjectData> 
             }
         }
 
-        // --- AUTOMATIC BACKGROUND MUSIC INSERTION ---
-        if (!project.audioTrack) {
-            try {
-                const sfxRes = await fetch('http://localhost:3000/api/sfx');
-                if (sfxRes.ok) {
-                    const { sfx } = await sfxRes.json();
-
-                    // Filter for actual music (longer files or specific names) in SFX folder
-                    // We look for "Music", "Sad", "Suspense", "Happy"
-                    const musicOptions = sfx.filter((f: string) =>
-                        f.toLowerCase().includes('music') ||
-                        f.toLowerCase().includes('suspense') ||
-                        f.toLowerCase().includes('happy') ||
-                        f.toLowerCase().includes('cinematic')
-                    );
-
-                    if (musicOptions.length > 0) {
-                        // Pick one based on theme if possible, otherwise random
-                        let bestMatch = musicOptions.find((f: string) => f.toLowerCase().includes(project.theme));
-                        if (!bestMatch) bestMatch = musicOptions[Math.floor(Math.random() * musicOptions.length)];
-
-                        project.audioTrack = `/api/serve/sfx/${encodeURIComponent(bestMatch)}`;
-                        console.log("Auto-Injected Music:", bestMatch);
-                    }
-                }
-            } catch (e) {
-                console.warn("Auto-Music failed", e);
-            }
-        }
+        // Automatic background music insertion disabled to allow manual control only
 
         // Smart SFX Injection disabled to allow manual control only
 
