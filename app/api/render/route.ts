@@ -11,7 +11,19 @@ const RENDER_STATUS_FILE = path.join(process.cwd(), 'render_status.json');
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { projectId, theme, colorFilter, aspectRatio, assets: clientAssets } = body;
+        const {
+            projectId,
+            theme,
+            colorFilter,
+            aspectRatio,
+            assets: clientAssets,
+            audioTrack,
+            voiceoverTrack,
+            sfxCues,
+            scriptContent,
+            captions,
+            fps
+        } = body;
 
         if (!projectId) {
             return NextResponse.json({ error: 'Missing projectId' }, { status: 400 });
@@ -67,9 +79,14 @@ export async function POST(req: NextRequest) {
                 theme: theme,
                 colorFilter: colorFilter || 'none',
                 assets: absoluteAssets, // Injecting assets directly!
-                fps: 30,
-                defaultImageDuration: 3
-                // Root.tsx will use this 'assets' array instead of fetching
+                audioTrack: audioTrack,
+                voiceoverTrack: voiceoverTrack,
+                sfxCues: sfxCues,
+                scriptContent: scriptContent,
+                captions: captions,
+                fps: fps || 30,
+                defaultImageDuration: 3,
+                serverOrigin: origin // Dynamically inject the Next.js server origin!
             }
         };
 

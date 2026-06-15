@@ -47,6 +47,7 @@ export const ProjectSchema = z.object({
     defaultImageDuration: z.number().default(3), // Seconds
     scriptContent: z.string().optional(), // Raw text
     captions: z.array(z.custom<CaptionCue>()).optional(), // Precise Timings from EdgeTTS
+    serverOrigin: z.string().optional(), // Dynamic host/port origin
 });
 
 export type Asset = z.infer<typeof AssetSchema>;

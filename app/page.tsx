@@ -236,7 +236,13 @@ export default function Home() {
           theme: selectedTheme,
           colorFilter: selectedFilter,
           aspectRatio,
-          assets: project?.assets
+          assets: project?.assets,
+          audioTrack: project?.audioTrack,
+          voiceoverTrack: project?.voiceoverTrack,
+          sfxCues: project?.sfxCues,
+          scriptContent: project?.scriptContent,
+          captions: project?.captions,
+          fps: project?.fps || 30
         })
       });
       const json = await res.json();

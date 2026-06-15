@@ -343,14 +343,17 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
             {/* Auto-SFX and background Crowd Noise disabled to allow manual control only */}
 
             {/* Smart Keyword SFX Layer */}
-            {pacedData.sfxCues?.map((cue) => (
-                <Sequence key={cue.id} from={Math.max(0, cue.startFrame)} layout="absolute-fill">
-                    <Audio
-                        src={`http://localhost:3000/api/serve/sfx/${encodeURIComponent(cue.filename)}`}
-                        volume={cue.volume}
-                    />
-                </Sequence>
-            ))}
+            {pacedData.sfxCues?.map((cue) => {
+                const origin = projectData.serverOrigin || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+                return (
+                    <Sequence key={cue.id} from={Math.max(0, cue.startFrame)} layout="absolute-fill">
+                        <Audio
+                            src={`${origin}/api/serve/sfx/${encodeURIComponent(cue.filename)}`}
+                            volume={cue.volume}
+                        />
+                    </Sequence>
+                );
+            })}
 
             {/* Captions Layer */}
             {projectData.voiceoverTrack && projectData.scriptContent && (
