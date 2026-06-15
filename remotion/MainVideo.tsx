@@ -340,37 +340,7 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
                 </TransitionSeries>
             </div>
 
-            {/* Auto-SFX Layer */}
-            {assets.map((asset, index) => {
-                // Calculate accumulated time
-                const prevDuration = assets
-                    .slice(0, index)
-                    .reduce((acc, a) => acc + (a.durationInSeconds || defaultImageDuration), 0);
-
-                // Play whoosh at the end of this clip (start of transition)
-                // We offset by -0.5s (15 frames) to sync with transition center
-                const triggerFrame = Math.round((prevDuration + (asset.durationInSeconds || defaultImageDuration)) * fps) - 15;
-
-                // Don't play after last clip
-                if (index === assets.length - 1) return null;
-
-                return (
-                    <Sequence key={`sfx-${index}`} from={Math.max(0, triggerFrame)} layout="absolute-fill">
-                        <Audio
-                            src={`http://localhost:3000/api/serve/sfx/${getThemedSFX(index)}`}
-                            volume={0.8}
-                        />
-                    </Sequence>
-                );
-            })}
-
-            {/* Continuous Stadium Crowd Noise for Sports Theme */}
-            {activeTheme === 'sports' && assets.length > 0 && (
-                <Audio
-                    src="http://localhost:3000/api/serve/sfx/People%20Clapping.mp3"
-                    volume={0.3} // Low volume in background
-                />
-            )}
+            {/* Auto-SFX and background Crowd Noise disabled to allow manual control only */}
 
             {/* Smart Keyword SFX Layer */}
             {pacedData.sfxCues?.map((cue) => (

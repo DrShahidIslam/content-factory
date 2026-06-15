@@ -156,46 +156,7 @@ export const fetchProjectData = async (projectId: string): Promise<ProjectData> 
             }
         }
 
-        // --- Smart SFX Injection ---
-        try {
-            const sfxRes = await fetch('http://localhost:3000/api/sfx');
-            if (sfxRes.ok) {
-                const { sfx } = await sfxRes.json();
-                const scriptAsset = data.assets.find((a: any) => a.name.toLowerCase() === 'script.txt');
-
-                if (scriptAsset && sfx.length > 0) {
-                    const textRes = await fetch(`http://localhost:3000${scriptAsset.path}`);
-                    if (textRes.ok) {
-                        const text = await textRes.text();
-                        console.log("SFX: Scanning Script...", text.substring(0, 50) + "...");
-
-                        const matches = scanScriptForSFX(text, sfx);
-                        console.log(`SFX: Found ${matches.length} keyword matches.`);
-
-                        // Scale SFX to match Actual VO Duration using character ratios
-                        const cleanText = text.replace(/\[[^\]]+\]/g, '');
-                        const estimatedDuration = cleanText.length / 12; // ~12 chars per second spoken
-                        const actualDuration = project.durationInSeconds || estimatedDuration; // Use final project duration (VO)
-
-                        project.sfxCues = matches.map((m: any, i) => {
-                            const exactTime = m.charRatio !== undefined 
-                                ? m.charRatio * actualDuration 
-                                : m.timestamp;
-
-                            return {
-                                id: `smart-sfx-${i}`,
-                                name: m.word,
-                                filename: m.filename,
-                                startFrame: Math.round(exactTime * 30),
-                                volume: 1.0 // Bump volume
-                            };
-                        });
-                    }
-                }
-            }
-        } catch (err) {
-            console.warn("SFX Injection failed", err);
-        }
+        // Smart SFX Injection disabled to allow manual control only
 
         return project;
     } catch (e) {
