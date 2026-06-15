@@ -11,6 +11,39 @@ import { Captions } from './Captions';
 import { ColorGrade } from './Visuals/ColorGrade';
 import { SportsOverlay } from './Visuals/SportsOverlay';
 
+const VideoWithFreeze: React.FC<{
+    src: string;
+    startFrom: number;
+    videoEndFrame: number;
+    playbackRate: number;
+    videoEndCompFrame: number;
+}> = ({ src, startFrom, videoEndFrame, playbackRate, videoEndCompFrame }) => {
+    const frame = useCurrentFrame();
+
+    if (frame >= videoEndCompFrame) {
+        // Freeze frame: starts from the end of the video segment and naturally stays there
+        return (
+            <Video
+                src={src}
+                startFrom={videoEndFrame - 1}
+                muted={true}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+        );
+    }
+
+    return (
+        <Video
+            src={src}
+            startFrom={startFrom}
+            playbackRate={playbackRate}
+            muted={true}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+    );
+};
+
+// SpeedRampedVideo split segments player for time remapping
 const SpeedRampedVideo: React.FC<{
     src: string;
     speedRamp: 'none' | 'impact-slow' | 'slow-fast' | 'fast-slow';
@@ -21,11 +54,20 @@ const SpeedRampedVideo: React.FC<{
     const totalDurationSec = originalDuration || (durationInFrames / fps);
 
     if (!speedRamp || speedRamp === 'none') {
+        const compDurationSec = durationInFrames / fps;
+        const playbackRate = totalDurationSec / compDurationSec;
+        const safePlaybackRate = Math.min(16, Math.max(0.1, playbackRate));
+
+        // When to transition to freeze-frame
+        const videoEndCompFrame = Math.round(durationInFrames * (playbackRate / safePlaybackRate));
+
         return (
-            <Video
+            <VideoWithFreeze
                 src={src}
-                muted={true}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                startFrom={0}
+                videoEndFrame={Math.round(totalDurationSec * fps)}
+                playbackRate={safePlaybackRate}
+                videoEndCompFrame={videoEndCompFrame}
             />
         );
     }
@@ -75,6 +117,9 @@ const SpeedRampedVideo: React.FC<{
                 const videoStartFrame = Math.round(startSec * fps);
                 const videoEndFrame = Math.round(endSec * fps);
 
+                // When does this segment run out of frames and freeze?
+                const videoEndCompFrame = Math.round(partDurationFrames * (playbackRate / safePlaybackRate));
+
                 return (
                     <Sequence
                         key={i}
@@ -82,17 +127,12 @@ const SpeedRampedVideo: React.FC<{
                         durationInFrames={partDurationFrames}
                         layout="absolute-fill"
                     >
-                        <Video
+                        <VideoWithFreeze
                             src={src}
                             startFrom={videoStartFrame}
-                            endAt={videoEndFrame}
+                            videoEndFrame={videoEndFrame}
                             playbackRate={safePlaybackRate}
-                            muted={true}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                            }}
+                            videoEndCompFrame={videoEndCompFrame}
                         />
                     </Sequence>
                 );
