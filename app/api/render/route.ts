@@ -11,7 +11,7 @@ const RENDER_STATUS_FILE = path.join(process.cwd(), 'render_status.json');
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { projectId, theme, colorFilter, aspectRatio } = body;
+        const { projectId, theme, colorFilter, aspectRatio, assets: clientAssets } = body;
 
         if (!projectId) {
             return NextResponse.json({ error: 'Missing projectId' }, { status: 400 });
@@ -35,21 +35,26 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Project not found' }, { status: 404 });
         }
 
-        // 1. Scan the project folder to get real assets
-        const { assets, realPath } = await scanProjectFolder(projectId);
-
         // Get the origin from the request to construct local HTTP URLs.
-        // Remotion's Puppeteer browser cannot access file:// URLs due to security constraints.
         const origin = req.nextUrl.origin;
 
-        // 2. Prepare Asset Objects with HTTP Paths for Remotion Node
-        const absoluteAssets = assets.map(a => {
-            const absoluteFilePath = path.join(realPath, a.name);
-            return {
+        // 1. Prepare Asset Objects with HTTP Paths for Remotion Node
+        let absoluteAssets = [];
+        if (clientAssets && Array.isArray(clientAssets)) {
+            absoluteAssets = clientAssets.map(a => ({
                 ...a,
-                path: `${origin}/api/serve-file?path=${encodeURIComponent(absoluteFilePath)}`,
-            };
-        });
+                path: a.path.startsWith('http') ? a.path : `${origin}${a.path}`
+            }));
+        } else {
+            const { assets: scannedAssets, realPath } = await scanProjectFolder(projectId);
+            absoluteAssets = scannedAssets.map(a => {
+                const absoluteFilePath = path.join(realPath, a.name);
+                return {
+                    ...a,
+                    path: `${origin}/api/serve-file?path=${encodeURIComponent(absoluteFilePath)}`,
+                };
+            });
+        }
 
         // Create a temporary props file
         const propsFilePath = path.join(projectDir, `render-props-${Date.now()}.json`);

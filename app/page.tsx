@@ -28,6 +28,20 @@ export default function Home() {
     setProject({ ...project, assets: newAssets });
   };
 
+  const updateAssetDuration = (index: number, seconds: number) => {
+    if (!project) return;
+    const newAssets = [...project.assets];
+    newAssets[index] = { ...newAssets[index], durationInSeconds: seconds };
+    setProject({ ...project, assets: newAssets });
+
+    // Recalculate durationInFrames
+    let totalDuration = 0;
+    newAssets.forEach(a => {
+      totalDuration += (a.durationInSeconds || project.defaultImageDuration);
+    });
+    setDurationInFrames(Math.max(30, Math.round(totalDuration * project.fps)));
+  };
+
   const updateScript = (text: string) => {
     if (!project) return;
     setProject({ ...project, scriptContent: text });
@@ -156,7 +170,8 @@ export default function Home() {
           projectId, // This is now the value from input (can be path or ID)
           theme: selectedTheme,
           colorFilter: selectedFilter,
-          aspectRatio
+          aspectRatio,
+          assets: project?.assets
         })
       });
       const json = await res.json();
@@ -286,6 +301,23 @@ export default function Home() {
                     onChange={(e) => updateAssetOverlay(i, e.target.value)}
                     className="bg-black/50 border border-white/10 rounded-md px-3 py-1.5 text-sm outline-none focus:border-purple-500 w-full mt-1 text-gray-200"
                   />
+                  {/* Target Duration Input */}
+                  <div className="mt-2 flex items-center justify-between gap-2 bg-black/30 p-2 rounded-md border border-white/5">
+                    <span className="text-xs text-gray-400 font-medium font-sans">Target Duration:</span>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        min={1}
+                        max={120}
+                        step={0.5}
+                        value={asset.durationInSeconds || 5}
+                        onChange={(e) => updateAssetDuration(i, parseFloat(e.target.value) || 5)}
+                        className="bg-black/60 border border-white/10 rounded px-2 py-0.5 text-xs outline-none focus:border-purple-500 text-gray-200 w-16 text-center"
+                      />
+                      <span className="text-xs text-gray-500 font-sans">sec</span>
+                    </div>
+                  </div>
+
                   {/* Speed Ramping Selection */}
                   {asset.type === 'video' && (
                     <div className="mt-2 flex items-center justify-between gap-2 bg-black/30 p-2 rounded-md border border-white/5">

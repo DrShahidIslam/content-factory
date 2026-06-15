@@ -5,6 +5,7 @@ export const AssetSchema = z.object({
     type: z.enum(['image', 'video', 'audio', 'script', 'unknown']),
     path: z.string(), // Serve path
     durationInSeconds: z.number().optional(), // For videos/audio
+    originalDuration: z.number().optional(), // Original scanned video duration
     playbackRate: z.number().optional(), // New: For Time Remapping
     overlayText: z.string().optional(), // Custom text overlay for this specific clip
     speedRamp: z.enum(['none', 'impact-slow', 'slow-fast', 'fast-slow']).optional(), // Time Ramping

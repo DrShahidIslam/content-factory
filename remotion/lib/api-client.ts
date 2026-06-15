@@ -1,7 +1,7 @@
 import { ProjectData } from '../types';
 import { prepareProjectData } from './sequencer';
 import { scanScriptForSFX } from './sfx-matcher';
-import { getAudioDurationInSeconds } from '@remotion/media-utils';
+import { getAudioDurationInSeconds, getVideoMetadata } from '@remotion/media-utils';
 
 export const fetchProjectData = async (projectId: string): Promise<ProjectData> => {
     try {
@@ -89,6 +89,30 @@ export const fetchProjectData = async (projectId: string): Promise<ProjectData> 
             }
         } catch (e) { console.log("Theme detect failed", e); }
 
+        // --- FETCH VIDEO DURATIONS DYNAMICALLY ---
+        for (const asset of project.assets) {
+            if (asset.type === 'video' && !asset.originalDuration) {
+                try {
+                    const fullUrl = asset.path.startsWith('http') ? asset.path : `http://localhost:3000${asset.path}`;
+                    const metadata = await getVideoMetadata(fullUrl);
+                    const dur = metadata.durationInSeconds;
+                    asset.originalDuration = dur;
+                    if (!asset.durationInSeconds) {
+                        asset.durationInSeconds = dur;
+                    }
+                    console.log(`[API Client] Scanned video ${asset.name} duration: ${dur}s`);
+                } catch (e) {
+                    console.warn(`[API Client] Failed to fetch video duration for ${asset.name}, fallback to 5s`, e);
+                    asset.originalDuration = 5;
+                    if (!asset.durationInSeconds) {
+                        asset.durationInSeconds = 5;
+                    }
+                }
+            } else if (asset.type === 'image' && !asset.durationInSeconds) {
+                asset.durationInSeconds = project.defaultImageDuration;
+            }
+        }
+
         // --- PREPARE DATA FOR RUNTIME PACING ---
         if (project.voiceoverTrack) {
             try {
@@ -97,16 +121,6 @@ export const fetchProjectData = async (projectId: string): Promise<ProjectData> 
 
                 // Store VO Duration as the Target Duration for proper syncing
                 project.durationInSeconds = voDuration;
-
-                // We do NOT modify assets here anymore. 
-                // We leave that to 'pacing-engine.ts' at runtime (in MainVideo).
-
-                // Just ensure defaults are set
-                project.assets.forEach(a => {
-                    if (a.type === 'video' && !a.durationInSeconds) a.durationInSeconds = 5;
-                    if (a.type === 'image' && !a.durationInSeconds) a.durationInSeconds = project.defaultImageDuration;
-                });
-
             } catch (err) {
                 console.warn("VO Duration fetch failed", err);
             }

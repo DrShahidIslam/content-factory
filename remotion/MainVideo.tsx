@@ -11,14 +11,14 @@ import { Captions } from './Captions';
 import { ColorGrade } from './Visuals/ColorGrade';
 import { SportsOverlay } from './Visuals/SportsOverlay';
 
-// SpeedRampedVideo split segments player for time remapping
 const SpeedRampedVideo: React.FC<{
     src: string;
     speedRamp: 'none' | 'impact-slow' | 'slow-fast' | 'fast-slow';
     durationInFrames: number;
+    originalDuration?: number;
     fps: number;
-}> = ({ src, speedRamp, durationInFrames, fps }) => {
-    const totalDurationSec = durationInFrames / fps;
+}> = ({ src, speedRamp, durationInFrames, originalDuration, fps }) => {
+    const totalDurationSec = originalDuration || (durationInFrames / fps);
 
     if (!speedRamp || speedRamp === 'none') {
         return (
@@ -147,6 +147,7 @@ const SequenceContent: React.FC<{
                     src={asset.path}
                     speedRamp={asset.speedRamp}
                     durationInFrames={durationInFrames}
+                    originalDuration={asset.originalDuration}
                     fps={fps}
                 />
             ) : null}
