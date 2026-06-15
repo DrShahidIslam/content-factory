@@ -5,7 +5,7 @@ import { Player } from '@remotion/player';
 import { MainVideo } from '../remotion/MainVideo';
 import { ProjectData } from '../remotion/types';
 import { fetchProjectData } from '../remotion/lib/api-client';
-import { Play, Video, Settings, Wand2, Download, RefreshCw, FolderOpen } from 'lucide-react';
+import { Play, Video, Settings, Wand2, Download, RefreshCw, FolderOpen, Music, Trash2, Plus } from 'lucide-react';
 
 export default function Home() {
   const [project, setProject] = useState<ProjectData | null>(null);
@@ -47,6 +47,60 @@ export default function Home() {
     setProject({ ...project, scriptContent: text });
   };
 
+  // SFX Timeline State
+  const [availableSfx, setAvailableSfx] = useState<string[]>([]);
+  const [selectedSfxToAdd, setSelectedSfxToAdd] = useState('');
+  const [newSfxTime, setNewSfxTime] = useState(0);
+  const [newSfxVolume, setNewSfxVolume] = useState(1.0);
+
+  const addSfxCue = () => {
+    if (!project || !selectedSfxToAdd) return;
+    const newCues = [...(project.sfxCues || [])];
+    const newCue = {
+      id: `manual-sfx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: selectedSfxToAdd.split('.')[0],
+      filename: selectedSfxToAdd,
+      startFrame: Math.round(newSfxTime * (project.fps || 30)),
+      volume: newSfxVolume
+    };
+    newCues.push(newCue);
+    setProject({ ...project, sfxCues: newCues });
+  };
+
+  const updateSfxCueTime = (id: string, seconds: number) => {
+    if (!project || !project.sfxCues) return;
+    const newCues = project.sfxCues.map(c => {
+      if (c.id === id) {
+        return {
+          ...c,
+          startFrame: Math.round(seconds * (project.fps || 30))
+        };
+      }
+      return c;
+    });
+    setProject({ ...project, sfxCues: newCues });
+  };
+
+  const updateSfxCueVolume = (id: string, vol: number) => {
+    if (!project || !project.sfxCues) return;
+    const newCues = project.sfxCues.map(c => {
+      if (c.id === id) {
+        return {
+          ...c,
+          volume: vol
+        };
+      }
+      return c;
+    });
+    setProject({ ...project, sfxCues: newCues });
+  };
+
+  const removeSfxCue = (id: string) => {
+    if (!project || !project.sfxCues) return;
+    const newCues = project.sfxCues.filter(c => c.id !== id);
+    setProject({ ...project, sfxCues: newCues });
+  };
+
   // Settings State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<'9:16' | '16:9'>('9:16');
@@ -78,6 +132,17 @@ export default function Home() {
 
     // Trigger load
     loadProjectInternal(initialPath);
+
+    // Fetch SFX list
+    fetch('/api/sfx')
+      .then(res => res.json())
+      .then(data => {
+        if (data.sfx && data.sfx.length > 0) {
+          setAvailableSfx(data.sfx);
+          setSelectedSfxToAdd(data.sfx[0]);
+        }
+      })
+      .catch(err => console.error("Failed to load sfx list", err));
   }, []);
 
   const loadProjectInternal = async (id: string, isManual = false) => {
@@ -361,6 +426,129 @@ export default function Home() {
                <Wand2 size={16} />
                Generate Voiceover Audio
             </button>
+          </div>
+
+          {/* Sound Effects & Timed Cues */}
+          <div className="glass-panel p-6 mt-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-200 flex items-center gap-2">
+              <Music className="w-5 h-5 text-purple-400" />
+              Sound Effects & Triggers (SFX)
+            </h2>
+
+            {/* Form to add a new SFX cue */}
+            <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-6 space-y-3">
+              <div className="text-xs text-purple-300 font-semibold uppercase tracking-wider">Add Sound Effect</div>
+              
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Select Sound Effect File</label>
+                <select
+                  value={selectedSfxToAdd}
+                  onChange={(e) => setSelectedSfxToAdd(e.target.value)}
+                  className="w-full bg-black/60 border border-white/10 rounded px-2 py-1.5 text-xs outline-none focus:border-purple-500 text-gray-200 cursor-pointer"
+                >
+                  {availableSfx.map((sfxName) => (
+                    <option key={sfxName} value={sfxName}>{sfxName}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Trigger Time (sec)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={120}
+                    step={0.1}
+                    value={newSfxTime}
+                    onChange={(e) => setNewSfxTime(parseFloat(e.target.value) || 0)}
+                    className="w-full bg-black/60 border border-white/10 rounded px-2.5 py-1 text-xs outline-none focus:border-purple-500 text-gray-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Volume (0 to 1)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    value={newSfxVolume}
+                    onChange={(e) => setNewSfxVolume(parseFloat(e.target.value) || 1.0)}
+                    className="w-full bg-black/60 border border-white/10 rounded px-2.5 py-1 text-xs outline-none focus:border-purple-500 text-gray-200"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={addSfxCue}
+                className="w-full py-1.5 bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 rounded text-xs font-medium transition-colors flex items-center justify-center gap-1 text-purple-200"
+              >
+                <Plus size={14} />
+                Add Sound Effect to Video
+              </button>
+            </div>
+
+            {/* Active SFX cues list */}
+            <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
+              <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider px-1">Active SFX Timeline</div>
+              
+              {project?.sfxCues && project.sfxCues.length > 0 ? (
+                project.sfxCues.map((cue) => {
+                  const currentSeconds = cue.startFrame / (project.fps || 30);
+                  return (
+                    <div key={cue.id} className="p-3 bg-black/40 rounded-lg border border-white/5 flex flex-col gap-2 relative group hover:border-purple-500/20 transition-colors">
+                      <div className="flex justify-between items-center pr-6">
+                        <span className="text-xs font-medium text-gray-200 truncate">{cue.filename}</span>
+                        <button
+                          onClick={() => removeSfxCue(cue.id)}
+                          className="absolute right-3 top-3 text-gray-500 hover:text-red-400 p-0.5 rounded transition-colors"
+                          title="Delete SFX cue"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        <div className="flex items-center justify-between gap-1.5 bg-black/40 px-2 py-1 rounded border border-white/5">
+                          <span className="text-[10px] text-gray-500">Play At:</span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min={0}
+                              max={120}
+                              step={0.1}
+                              value={Number(currentSeconds.toFixed(1))}
+                              onChange={(e) => updateSfxCueTime(cue.id, parseFloat(e.target.value) || 0)}
+                              className="bg-transparent text-right outline-none text-xs text-purple-300 font-medium w-12"
+                            />
+                            <span className="text-[10px] text-gray-500">s</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-1.5 bg-black/40 px-2 py-1 rounded border border-white/5">
+                          <span className="text-[10px] text-gray-500">Vol:</span>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="number"
+                              min={0}
+                              max={1}
+                              step={0.1}
+                              value={cue.volume ?? 1.0}
+                              onChange={(e) => updateSfxCueVolume(cue.id, parseFloat(e.target.value) || 1.0)}
+                              className="bg-transparent text-right outline-none text-xs text-purple-300 font-medium w-12"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center text-xs text-gray-500 py-6 border border-dashed border-white/10 rounded-lg">
+                  No sound effects added yet. Add one above!
+                </div>
+              )}
+            </div>
           </div>
         </section>
 

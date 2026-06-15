@@ -355,32 +355,31 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
                 if (index === assets.length - 1) return null;
 
                 return (
-                    <Audio
-                        key={`sfx-${index}`}
-                        src={`http://localhost:3000/api/serve/sfx/${getThemedSFX(index)}`}
-                        startFrom={Math.max(0, triggerFrame)}
-                        endAt={triggerFrame + 30}
-                        volume={0.8}
-                    />
+                    <Sequence key={`sfx-${index}`} from={Math.max(0, triggerFrame)} layout="absolute-fill">
+                        <Audio
+                            src={`http://localhost:3000/api/serve/sfx/${getThemedSFX(index)}`}
+                            volume={0.8}
+                        />
+                    </Sequence>
                 );
             })}
 
             {/* Continuous Stadium Crowd Noise for Sports Theme */}
             {activeTheme === 'sports' && assets.length > 0 && (
                 <Audio
-                    src="http://localhost:3000/api/serve/sfx/Stadium%20Cheer.mp3"
+                    src="http://localhost:3000/api/serve/sfx/People%20Clapping.mp3"
                     volume={0.3} // Low volume in background
                 />
             )}
 
             {/* Smart Keyword SFX Layer */}
             {pacedData.sfxCues?.map((cue) => (
-                <Audio
-                    key={cue.id}
-                    src={`http://localhost:3000/api/serve/sfx/${encodeURIComponent(cue.filename)}`}
-                    startFrom={Math.max(0, cue.startFrame)}
-                    volume={cue.volume}
-                />
+                <Sequence key={cue.id} from={Math.max(0, cue.startFrame)} layout="absolute-fill">
+                    <Audio
+                        src={`http://localhost:3000/api/serve/sfx/${encodeURIComponent(cue.filename)}`}
+                        volume={cue.volume}
+                    />
+                </Sequence>
             ))}
 
             {/* Captions Layer */}
