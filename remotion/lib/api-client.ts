@@ -158,22 +158,24 @@ export const fetchProjectData = async (projectId: string): Promise<ProjectData> 
                         const matches = scanScriptForSFX(text, sfx);
                         console.log(`SFX: Found ${matches.length} keyword matches.`);
 
-                        // 5. Scale SFX to match Actual VO Duration
-                        // 5. Scale SFX to match Actual VO Duration
-                        // Our estimation was based on 2.5 words/sec.
-                        // We need to stretch/shrink cues to fit the Real Audio.
+                        // Scale SFX to match Actual VO Duration using character ratios
+                        const cleanText = text.replace(/\[[^\]]+\]/g, '');
+                        const estimatedDuration = cleanText.length / 12; // ~12 chars per second spoken
+                        const actualDuration = project.durationInSeconds || estimatedDuration; // Use final project duration (VO)
 
-                        const estimatedDuration = text.split(/\s+/).length / 2.5;
-                        const actualDuration = project.durationInSeconds || estimatedDuration; // Use final project duration (which matches VO)
-                        const scaleRatio = actualDuration / estimatedDuration;
+                        project.sfxCues = matches.map((m: any, i) => {
+                            const exactTime = m.charRatio !== undefined 
+                                ? m.charRatio * actualDuration 
+                                : m.timestamp;
 
-                        project.sfxCues = matches.map((m, i) => ({
-                            id: `smart-sfx-${i}`,
-                            name: m.word,
-                            filename: m.filename,
-                            startFrame: Math.round(m.timestamp * scaleRatio * 30),
-                            volume: 1.0 // Bump volume
-                        }));
+                            return {
+                                id: `smart-sfx-${i}`,
+                                name: m.word,
+                                filename: m.filename,
+                                startFrame: Math.round(exactTime * 30),
+                                volume: 1.0 // Bump volume
+                            };
+                        });
                     }
                 }
             }

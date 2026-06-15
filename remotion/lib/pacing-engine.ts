@@ -5,7 +5,7 @@ import { getAudioDurationInSeconds } from '@remotion/media-utils'; // Note: This
 // We assume api-client has already populated 'durationInSeconds' with RAW values.
 // This function strictly handles the SCALING logic based on Theme/Transition.
 
-export const applyHybridPacing = (project: ProjectData, activeTheme: 'horror' | 'exciting' | 'happy' | 'default'): ProjectData => {
+export const applyHybridPacing = (project: ProjectData, activeTheme: 'horror' | 'exciting' | 'happy' | 'sports' | 'default'): ProjectData => {
     // Clone to avoid mutation
     const p = { ...project, assets: project.assets.map(a => ({ ...a })) };
 

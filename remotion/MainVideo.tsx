@@ -9,9 +9,10 @@ import { flip } from '@remotion/transitions/flip';
 import { applyHybridPacing } from './lib/pacing-engine';
 import { Captions } from './Captions';
 import { ColorGrade } from './Visuals/ColorGrade';
+import { SportsOverlay } from './Visuals/SportsOverlay';
 
 // Random Transition Picker (Themed)
-const getThemedTransition = (index: number, theme: 'horror' | 'exciting' | 'happy' | 'default') => {
+const getThemedTransition = (index: number, theme: 'horror' | 'exciting' | 'happy' | 'sports' | 'default'): any => {
     let transitions;
 
     switch (theme) {
@@ -22,6 +23,10 @@ const getThemedTransition = (index: number, theme: 'horror' | 'exciting' | 'happ
         case 'exciting':
             // Action: Fast cuts, slides, wipes
             transitions = [slide(), wipe(), flip()];
+            break;
+        case 'sports':
+            // Sports: Very fast cuts, flash transitions (simulated by fast fade/slide)
+            transitions = [slide({ direction: 'from-left' }), slide({ direction: 'from-bottom' })];
             break;
         case 'happy':
             transitions = [fade(), slide()];
@@ -49,13 +54,13 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
     const activeTheme = projectData.theme || 'default'; // Current UI theme
 
     // Themed Duration
-    const TRANSITION_DURATION = activeTheme === 'horror' ? 30 : 10;
+    const TRANSITION_DURATION = activeTheme === 'horror' ? 30 : (activeTheme === 'sports' ? 5 : 10);
 
     // Themed Transition SFX
     const getThemedSFX = (idx: number) => {
         if (activeTheme === 'horror') return 'Cinematic Boom 1.mp3'; // Scarier
         if (activeTheme === 'happy') return 'Pop 1.mp3';
-        if (activeTheme === 'exciting') return 'Whoosh 3.mp3';
+        if (activeTheme === 'exciting' || activeTheme === 'sports') return 'Whoosh 3.mp3';
         return 'Cinematic Whoosh.mp3';
     }
 
@@ -110,10 +115,15 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
                                         style={{
                                             width: '100%',
                                             height: '100%',
-                                            objectFit: 'cover'
+                                            objectFit: 'cover' // This ensures 16:9 fills 9:16 perfectly
                                         }}
                                     />
                                 ) : null}
+
+                                {/* Custom Text Overlay for this clip */}
+                                {asset.overlayText && (
+                                    <SportsOverlay text={asset.overlayText} styleType={activeTheme === 'sports' ? 'gold' : 'impact'} />
+                                )}
                             </TransitionSeries.Sequence>
 
                             {/* Auto-Transition between clips (except last one) */}
@@ -145,14 +155,21 @@ export const MainVideo: React.FC<{ projectData: ProjectData }> = ({ projectData 
                 return (
                     <Audio
                         key={`sfx-${index}`}
-                        src="http://localhost:3000/api/serve/sfx/Cinematic%20Whoosh.mp3"
-                        startFrom={triggerFrame}
+                        src={`http://localhost:3000/api/serve/sfx/${getThemedSFX(index)}`}
+                        startFrom={Math.max(0, triggerFrame)}
                         endAt={triggerFrame + 30}
-
                         volume={0.8}
                     />
                 );
             })}
+
+            {/* Continuous Stadium Crowd Noise for Sports Theme */}
+            {activeTheme === 'sports' && assets.length > 0 && (
+                <Audio
+                    src="http://localhost:3000/api/serve/sfx/Stadium%20Cheer.mp3"
+                    volume={0.3} // Low volume in background
+                />
+            )}
 
             {/* Smart Keyword SFX Layer */}
             {pacedData.sfxCues?.map((cue) => (

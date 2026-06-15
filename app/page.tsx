@@ -14,10 +14,22 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [durationInFrames, setDurationInFrames] = useState(300);
 
+  const updateAssetOverlay = (index: number, text: string) => {
+    if (!project) return;
+    const newAssets = [...project.assets];
+    newAssets[index] = { ...newAssets[index], overlayText: text };
+    setProject({ ...project, assets: newAssets });
+  };
+
+  const updateScript = (text: string) => {
+    if (!project) return;
+    setProject({ ...project, scriptContent: text });
+  };
+
   // Settings State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<'9:16' | '16:9'>('9:16');
-  const [selectedTheme, setSelectedTheme] = useState<'default' | 'horror' | 'exciting' | 'happy'>('default');
+  const [selectedTheme, setSelectedTheme] = useState<'default' | 'horror' | 'exciting' | 'happy' | 'sports'>('sports');
   const [selectedVoice, setSelectedVoice] = useState('en-US-ChristopherNeural');
 
   const VOICES = [
@@ -84,7 +96,8 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           projectId: projectId || projectPathInput,
-          voice: selectedVoice
+          voice: selectedVoice,
+          scriptContent: project?.scriptContent
         })
       });
       const json = await res.json();
@@ -242,20 +255,52 @@ export default function Home() {
             <h2 className="text-lg font-semibold mb-4 text-gray-200">Asset Timeline</h2>
             <div className="space-y-3">
               {project ? project.assets.map((asset, i) => (
-                <div key={i} className="group flex items-center gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-purple-500/30">
-                  <div className="w-8 h-8 rounded-full bg-purple-900/50 flex items-center justify-center text-xs font-bold text-purple-300">
-                    {i + 1}
+                <div key={i} className="group flex flex-col gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-purple-500/30">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-purple-900/50 flex items-center justify-center text-xs font-bold text-purple-300">
+                      {i + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate text-gray-200">{asset.name}</div>
+                      <div className="text-xs text-gray-500 capitalize">{asset.type} • {asset.durationInSeconds || project.defaultImageDuration}s</div>
+                    </div>
+                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate text-gray-200">{asset.name}</div>
-                    <div className="text-xs text-gray-500 capitalize">{asset.type} • {asset.durationInSeconds || project.defaultImageDuration}s</div>
-                  </div>
-                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                  {/* Dynamic Text Overlay Input */}
+                  <input
+                    type="text"
+                    placeholder="Epic Text Overlay (e.g., WHAT A GOAL!)"
+                    value={asset.overlayText || ''}
+                    onChange={(e) => updateAssetOverlay(i, e.target.value)}
+                    className="bg-black/50 border border-white/10 rounded-md px-3 py-1.5 text-sm outline-none focus:border-purple-500 w-full mt-1 text-gray-200"
+                  />
                 </div>
               )) : (
                 <div className="text-center text-gray-500 py-10">Loading assets...</div>
               )}
             </div>
+          </div>
+
+          {/* Voiceover Master Script */}
+          <div className="glass-panel p-6 mt-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-200 flex items-center gap-2">
+               <Wand2 className="w-5 h-5 text-purple-400" />
+               Master Script (Voiceover)
+            </h2>
+            <textarea
+              value={project?.scriptContent || ''}
+              onChange={(e) => updateScript(e.target.value)}
+              placeholder="Enter the voiceover script for the video here..."
+              className="w-full bg-black/50 border border-white/10 rounded-lg p-3 outline-none focus:border-purple-500 min-h-[100px] text-gray-200 text-sm"
+            />
+            <button
+               onClick={handleGenerateVO}
+               disabled={loading}
+               className="mt-3 w-full py-2 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            >
+               <Wand2 size={16} />
+               Generate Voiceover Audio
+            </button>
           </div>
         </section>
 
@@ -325,8 +370,7 @@ export default function Home() {
 
               <Download className="w-5 h-5 z-10" />
               {isRendering ? `Rendering ${renderProgress}%...` : 'Render Video'}
-            </span>
-          </button>
+            </button>
         </div>
       </section>
     </main>
@@ -379,6 +423,7 @@ export default function Home() {
               onChange={(e) => setSelectedTheme(e.target.value as any)}
               className="w-full bg-black/50 border border-white/10 rounded-lg p-3 outline-none focus:border-purple-500"
             >
+              <option value="sports">World Cup Highlights (Sports)</option>
               <option value="default">Default / Mixed</option>
               <option value="horror">Horror (Slow Fades)</option>
               <option value="exciting">Action (Fast Cuts)</option>
@@ -420,8 +465,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-    )
-  }
-        </div >
-        );
+    )}
+    </div>
+  );
 }

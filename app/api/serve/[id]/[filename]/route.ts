@@ -12,7 +12,13 @@ export async function GET(
 
     // Security: Prevent directory traversal & Decode URI (spaces)
     const safeFilename = path.basename(decodeURIComponent(filename));
-    const videoPath = path.join(PROJECTS_ROOT, id, safeFilename);
+    let videoPath = '';
+    
+    if (id === 'sfx') {
+        videoPath = path.join(`G:\\Iskills\\Youtube\\Youtube Sound Effects\\background sfx`, safeFilename);
+    } else {
+        videoPath = path.join(PROJECTS_ROOT, id, safeFilename);
+    }
 
     try {
         if (!fs.existsSync(videoPath)) {

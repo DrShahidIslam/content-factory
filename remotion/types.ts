@@ -6,6 +6,7 @@ export const AssetSchema = z.object({
     path: z.string(), // Serve path
     durationInSeconds: z.number().optional(), // For videos/audio
     playbackRate: z.number().optional(), // New: For Time Remapping
+    overlayText: z.string().optional(), // Custom text overlay for this specific clip
 });
 
 export interface SFXCue {
@@ -36,9 +37,8 @@ export const ProjectSchema = z.object({
     audioTrack: z.string().optional(),
     voiceoverTrack: z.string().optional(),
     voiceoverPlaybackRate: z.number().optional(), // New: Elastic Audio
-    theme: z.enum(['horror', 'exciting', 'happy', 'default']).default('default'),
+    theme: z.enum(['horror', 'exciting', 'happy', 'sports', 'default']).default('default'),
     sfxCues: z.array(z.custom<SFXCue>()).optional(),
-    fps: z.number().default(30),
     fps: z.number().default(30),
     durationInSeconds: z.number().optional(), // Master duration
     defaultImageDuration: z.number().default(3), // Seconds

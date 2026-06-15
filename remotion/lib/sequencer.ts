@@ -9,9 +9,8 @@ export const sortAssets = (assets: Asset[]): Asset[] => {
 export const prepareProjectData = (id: string, assets: Asset[]): ProjectData => {
     const sorted = sortAssets(assets);
 
-    // Identify audio tracks
-    // Identify audio tracks
-    const voKeywords = ['voiceover', 'voice over', 'vo_', 'narration', 'speech', 'tts', 'script', 'audio', 'rec', 'recording'];
+    // Identify audio tracks (broad search to allow user pre-generated VOs)
+    const voKeywords = ['voiceover', 'voice over', 'vo_', 'vo.', 'vo', 'narration', 'speech', 'tts', 'script', 'rec', 'recording', 'generated'];
 
     // STRICT TYPE CHECK: Must be type 'audio'
     const voiceover = sorted.find(a =>
@@ -20,7 +19,8 @@ export const prepareProjectData = (id: string, assets: Asset[]): ProjectData => 
     );
 
     const music = sorted.find(a =>
-        a.type === 'audio' && (
+        a.type === 'audio' && 
+        a !== voiceover && (
             a.name.toLowerCase().includes('music') ||
             a.name.toLowerCase().includes('bg_') ||
             a.name.toLowerCase().includes('background') ||

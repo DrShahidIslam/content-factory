@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-const SFX_ROOT = path.resolve('..', 'projects', 'sfx');
+const SFX_ROOT = `G:\\Iskills\\Youtube\\Youtube Sound Effects\\background sfx`;
 
 export async function GET() {
     try {

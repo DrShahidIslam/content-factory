@@ -8,7 +8,7 @@ import { EdgeTTS } from 'node-edge-tts';
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { projectId } = body;
+        const { projectId, scriptContent: newScriptContent } = body;
 
         if (!projectId) return NextResponse.json({ error: 'Missing projectId' }, { status: 400 });
 
@@ -21,6 +21,11 @@ export async function POST(req: Request) {
         }
 
         const scriptPath = path.join(realPath, scriptFile.name);
+        
+        // Update script file if provided from UI
+        if (newScriptContent) {
+            fs.writeFileSync(scriptPath, newScriptContent, 'utf-8');
+        }
         const scriptContent = fs.readFileSync(scriptPath, 'utf-8');
 
         // Output file
@@ -39,7 +44,9 @@ export async function POST(req: Request) {
 
         const mp3Path = path.join(realPath, 'voiceover_generated.mp3');
 
-        await tts.ttsPromise(scriptContent, mp3Path);
+        // Clean script text for TTS: Remove bracketed emotional tags like [fail] or [cheer]
+        const cleanScriptContent = scriptContent.replace(/\[[^\]]+\]/g, '').trim();
+        await tts.ttsPromise(cleanScriptContent, mp3Path);
 
         // Cleanup old wav if exists to avoid confusion?
         const oldWav = path.join(realPath, 'voiceover_generated.wav');

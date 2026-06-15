@@ -18,7 +18,8 @@ export const RemotionRoot: React.FC = () => {
                         id: 'demo-test',
                         assets: [],
                         fps: 30,
-                        defaultImageDuration: 3
+                        defaultImageDuration: 3,
+                        theme: 'sports'
                     }
                 }}
                 calculateMetadata={async ({ props }) => {
@@ -72,7 +73,8 @@ export const RemotionRoot: React.FC = () => {
                         id: 'demo-test',
                         assets: [],
                         fps: 30,
-                        defaultImageDuration: 3
+                        defaultImageDuration: 3,
+                        theme: 'sports'
                     }
                 }}
                 calculateMetadata={async ({ props }) => {

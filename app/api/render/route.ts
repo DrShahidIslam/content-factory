@@ -38,12 +38,18 @@ export async function POST(req: NextRequest) {
         // 1. Scan the project folder to get real assets
         const { assets, realPath } = await scanProjectFolder(projectId);
 
-        // 2. Prepare Asset Objects with Absolute Paths for Remotion Node
-        const absoluteAssets = assets.map(a => ({
-            ...a,
-            // For Node.js rendering, file:// URLs are robust
-            path: `file://${path.join(realPath, a.name).replace(/\\/g, '/')}`,
-        }));
+        // Get the origin from the request to construct local HTTP URLs.
+        // Remotion's Puppeteer browser cannot access file:// URLs due to security constraints.
+        const origin = req.nextUrl.origin;
+
+        // 2. Prepare Asset Objects with HTTP Paths for Remotion Node
+        const absoluteAssets = assets.map(a => {
+            const absoluteFilePath = path.join(realPath, a.name);
+            return {
+                ...a,
+                path: `${origin}/api/serve-file?path=${encodeURIComponent(absoluteFilePath)}`,
+            };
+        });
 
         // Create a temporary props file
         const propsFilePath = path.join(projectDir, `render-props-${Date.now()}.json`);

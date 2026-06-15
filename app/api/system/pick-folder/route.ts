@@ -1,18 +1,31 @@
 
 import { NextResponse } from 'next/server';
 import { exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST() {
     try {
-        // Powershell command to open a native Folder Picker Dialog
-        // We use System.Windows.Forms (available in standard Windows .NET environment)
-        // This is a "Zero-Cost" hack to get native functionality in a web app running locally.
-        // Use a strictly formatted single-line command
-        // -sta is crucial for Forms/Dialogs on Windows
-        const command = `powershell -sta -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.FolderBrowserDialog; $f.Description = 'Select content folder'; $f.ShowNewFolderButton = $true; if ($f.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output $f.SelectedPath }"`;
+        // Use VBScript to open a native Folder Picker Dialog.
+        // This is highly reliable on Windows and bypasses PowerShell STA thread and execution policy constraints.
+        const tempVbsPath = path.join(process.cwd(), `temp_picker_${Date.now()}.vbs`);
+        const vbsScript = `
+Set objShell = CreateObject("Shell.Application")
+Set objFolder = objShell.BrowseForFolder(0, "Select Content Folder", 0, 0)
+If Not objFolder Is Nothing Then
+    WScript.Echo objFolder.Self.Path
+End If
+`;
+        fs.writeFileSync(tempVbsPath, vbsScript);
+        const command = `cscript //NoLogo "${tempVbsPath}"`;
 
-        const path = await new Promise<string>((resolve, reject) => {
+        const chosenPath = await new Promise<string>((resolve, reject) => {
             exec(command, (error, stdout, stderr) => {
+                // Cleanup temp file
+                try {
+                    if (fs.existsSync(tempVbsPath)) fs.unlinkSync(tempVbsPath);
+                } catch (e) {}
+
                 if (error) {
                     console.error('Picker error:', stderr);
                     reject(error);
@@ -22,11 +35,11 @@ export async function POST() {
             });
         });
 
-        if (!path) {
+        if (!chosenPath) {
             return NextResponse.json({ cancelled: true });
         }
 
-        return NextResponse.json({ path });
+        return NextResponse.json({ path: chosenPath });
 
     } catch (error) {
         console.error(error);
